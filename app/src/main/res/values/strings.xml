@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">Restaurantino</string>
+    <string name="total_a_pagar">Total a pagar: %1$s</string>
+</resources>
