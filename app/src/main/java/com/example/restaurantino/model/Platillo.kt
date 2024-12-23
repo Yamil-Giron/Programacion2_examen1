@@ -1,3 +1,3 @@
-package com.example.restaurante.model
+package com.example.restaurantino.model
 
 data class Platillo(val nombre: String, val precio: Int)

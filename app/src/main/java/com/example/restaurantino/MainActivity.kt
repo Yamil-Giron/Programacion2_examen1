@@ -1,8 +1,14 @@
 package com.example.restaurantino
 
 import android.os.Bundle
-import android.widget.*
+import android.text.Editable
+import android.text.TextWatcher
+import android.widget.EditText
+import android.widget.Switch
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import java.text.NumberFormat
+import java.util.*
 
 class MainActivity : AppCompatActivity() {
 
@@ -10,38 +16,41 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        val editTextCantidadPastel = findViewById<EditText>(R.id.editTextCantidadPastel)
-        val editTextCantidadCazuela = findViewById<EditText>(R.id.editTextCantidadCazuela)
-        val checkBoxPropina = findViewById<CheckBox>(R.id.checkBoxPropina)
-        val buttonCalcular = findViewById<Button>(R.id.buttonCalcular)
-        val textViewResumen = findViewById<TextView>(R.id.textViewResumen)
-        val textViewTotal = findViewById<TextView>(R.id.textViewTotal)
+        val pastelPrice = 12000
+        val cazuelaPrice = 10000
 
-        buttonCalcular.setOnClickListener {
-            val cantidadPastel = editTextCantidadPastel.text.toString().toIntOrNull() ?: 0
-            val cantidadCazuela = editTextCantidadCazuela.text.toString().toIntOrNull() ?: 0
+        val pastelQtyEditText = findViewById<EditText>(R.id.pastelQtyEditText)
+        val cazuelaQtyEditText = findViewById<EditText>(R.id.cazuelaQtyEditText)
+        val tipSwitch = findViewById<Switch>(R.id.tipSwitch)
+        val totalTextView = findViewById<TextView>(R.id.totalTextView)
 
-            val precioPastel = 12000
-            val precioCazuela = 10000
+        val numberFormat = NumberFormat.getCurrencyInstance(Locale("es", "CL"))
 
-            val totalPastel = cantidadPastel * precioPastel
-            val totalCazuela = cantidadCazuela * precioCazuela
-            var total = totalPastel + totalCazuela
+        val calculateTotal = {
+            val pastelQty = pastelQtyEditText.text.toString().toIntOrNull() ?: 0
+            val cazuelaQty = cazuelaQtyEditText.text.toString().toIntOrNull() ?: 0
 
-            if (checkBoxPropina.isChecked) {
+            var total = (pastelQty * pastelPrice) + (cazuelaQty * cazuelaPrice)
+
+            if (tipSwitch.isChecked) {
                 total += (total * 0.1).toInt()
             }
 
-            val resumen = StringBuilder()
-            if (cantidadPastel > 0) {
-                resumen.append("Pastel de Choclo: $cantidadPastel x $$precioPastel = $$totalPastel\n")
-            }
-            if (cantidadCazuela > 0) {
-                resumen.append("Cazuela: $cantidadCazuela x $$precioCazuela = $$totalCazuela\n")
-            }
-
-            textViewResumen.text = resumen.toString()
-            textViewTotal.text = "Total a pagar: $$total"
+            totalTextView.text = "Total: ${numberFormat.format(total)}"
         }
+
+        pastelQtyEditText.addTextChangedListener(object : TextWatcher {
+            override fun afterTextChanged(s: Editable?) = calculateTotal()
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+        })
+
+        cazuelaQtyEditText.addTextChangedListener(object : TextWatcher {
+            override fun afterTextChanged(s: Editable?) = calculateTotal()
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+        })
+
+        tipSwitch.setOnCheckedChangeListener { _, _ -> calculateTotal() }
     }
 }
